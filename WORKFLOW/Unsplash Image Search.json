@@ -1,0 +1,133 @@
+{
+  "name": "Unsplash Image Search",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "search-images",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "9701ed50-311f-42d1-ab50-bf1a3b6a6e2a",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        304
+      ],
+      "webhookId": "6bcefe54-61fd-4fdd-b5c6-ab4bb1ebb6a9"
+    },
+    {
+      "parameters": {
+        "url": "https://api.unsplash.com/search/photos",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.query.q }}"
+            },
+            {
+              "name": "per_page",
+              "value": "3"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e568e4e1-cabb-444f-bb69-fb02a7615593",
+      "name": "Fetch Images from Unsplash",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        464,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "images",
+              "value": "={{ $json.results.map(r => r.urls.full) }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fc01e9d6-c1a9-4256-afe2-db4b464abb0d",
+      "name": "Extract Image URLs",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "659f72ab-4735-4a1c-9ec3-700a84e1b314",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        912,
+        304
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Fetch Images from Unsplash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Images from Unsplash": {
+      "main": [
+        [
+          {
+            "node": "Extract Image URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Image URLs": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "cadcdb2a-de15-4077-92d6-7e374f203ddf",
+  "meta": {
+    "instanceId": "edac73b3bcb9953f813b2f3d48cacc22c3f0db356488fb54aedc5e24ee36451b"
+  },
+  "id": "VscFhlLc7ApN2jb2",
+  "tags": []
+}
